@@ -3,12 +3,13 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --color-fundo: #F4F4F4; /* Novo fundo cinza claro */
+  --color-fundo: #F4F4F4;
   --color-principal: #8F88D3;
   --color-texto-principal: #474747;
   --color-texto-secundario: #666666;
   --color-texto-secao: #FFFF;
   --color-destaque-claro: #FFFFFF;
+  --color-botoes: #0468BF;
   --font-principal: 'Poppins', sans-serif;
 }
 
@@ -19,7 +20,7 @@
   --color-texto-secao: #FFFF;
   --color-texto-secundario: #A0A0A0;
   --color-destaque-claro: #3A3A3A;
-  --color-desconto: #4CAF50;
+  --color-botoes: #0468BF;
 }
 
 body {

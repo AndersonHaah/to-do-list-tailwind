@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { IoAddCircleSharp } from "react-icons/io5";
 
 export default (props) => {
     const [tasks, setTasks] = useState([])
@@ -99,7 +100,7 @@ export default (props) => {
             </div>
 
             <div className="wrather-homepage flex w-screen h-screen">
-                <div className="nav-container w-1/5 mb-15 mt-7 mx-5 rounded-2xl bg-destaque-claro shadow-md hover:shadow-lg transition-all duration-150 ease">
+                <div className="nav-container w-1/5 mb-15 mt-7 mx-5 rounded-2xl bg-destaque-claro shadow-md hover:shadow-lg transition-all duration-150 ease grid">
                     <nav className="m-5 flex flex-col text-texto-principal font-principal">
                         <p className="mt-2 text-texto-secundario text-sm  p-1 border-b">Atalhos</p>
 
@@ -115,6 +116,10 @@ export default (props) => {
                         <p className="mt-2 text-texto-secundario text-sm  p-1 border-b">Area de trabalho</p>
                         {/* Backend */}
                     </nav>
+
+                    <button className="icon self-end justify-self-end  w-10 h-10 rounded-full grid items-center justify-center m-2">
+                        <IoAddCircleSharp className=" text-2xl scale-150 text-principal cursor-pointer hover:rotate-360 hover:scale-180 transition-all duration-600 ease-in-out"/>
+                    </button>
                 </div>
 
                 <div className="w-1/1 bg-destaque-claro mb-15 mt-7 mr-5 rounded-2xl shadow-md hover:shadow-lg transition-all duration-150 ease p-5">
