@@ -1,27 +1,94 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 export default (props) => {
     const [tasks, setTasks] = useState([])
 
     const [inputValue, setInputValue] = useState("")
 
+    const [subValue, setSubValue] = useState("")
+
+    const API_URL = "http://localhost:3000/tasks"
+
+    useEffect(() => {
+        fetch(API_URL)
+            .then((response) => response.json())
+            .then((data) => {
+                setTasks(data)
+            })
+            .catch((error) => console.error("Erro ao carregar as tarefas:", error))
+    }, [])
+
     const addTask = () => {
-        if (inputValue.trim() === "") {
+        if (subValue.trim() === "") {
             return
         }
 
         const newTask = {
             id: Date.now(),
+            subject: subValue,
             text: inputValue,
+            completed: false,
+            important: false,
         }
 
-        setTasks([...tasks, newTask])
-        setInputValue("")
+        fetch(API_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(newTask),
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                setTasks([...tasks, data])
+                setInputValue("")
+                setSubValue("")
+            })
+            .catch((error) => console.error("Erro ao adicionar a tarefa:", error))
+    }
+
+    const toggleImportant = (id) => {
+        const taskToUpdate = tasks.find((task) => task.id === id)
+        const updatedTask = { ...taskToUpdate, important: !taskToUpdate.important }
+
+        fetch(`${API_URL}/${id}`, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(updatedTask)
+        })
+            .then(() => {
+                setTasks(tasks.map((task) => (task.id === id ? updatedTask : task)))
+            })
+            .catch((error) => console.error("Erro ao atualizar a tarefa:", error))
+    }
+
+    const toggleComplete = (id) => {
+        const taskToUpdate = tasks.find((task) => task.id === id)
+        const updatedTask = { ...taskToUpdate, completed: !taskToUpdate.completed }
+
+        fetch(`${API_URL}/${id}`, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(updatedTask),
+        })
+            .then(() => {
+                setTasks(tasks.map((task) => (task.id === id ? updatedTask : task)))
+            })
+            .catch((error) => console.error("Erro ao atualizar a tarefa:", error))
     }
 
     const removeTask = (id) => {
-        const updatedTasks = tasks.filter((task) => task.id !== id)
-        setTasks(updatedTasks)
+        fetch(`${API_URL}/${id}`, {
+            method: "DELETE",
+        })
+            .then(() => {
+                setTasks(tasks.filter((task) => task.id !== id))
+            })
+            .catch((error) => console.error("Erro ao remover a tarefa:", error))
     }
 
 
@@ -49,47 +116,97 @@ export default (props) => {
                         {/* Backend */}
                     </nav>
                 </div>
+
                 <div className="w-1/1 bg-destaque-claro mb-15 mt-7 mr-5 rounded-2xl shadow-md hover:shadow-lg transition-all duration-150 ease p-5">
                     <h2 className="text-2xl font-bold mb-4">Minha Lista de Tarefas</h2>
+
                     <div className="flex mb-4">
+
                         <input
-                            type="text"
                             className="flex-grow p-2 rounded-l-md"
+                            type="text"
                             placeholder="Adicionar nova tarefa..."
+
+                            value={subValue}
+                            onChange={(e) => setSubValue(e.target.value)}
+
+                            onKeyDown={(e) => e.key === "Enter" && addTask()}
+
+                        />
+
+                        <input
+                            className="flex-grow p-2 rounded-l-md"
+                            type="text"
+                            placeholder="Adicionar nova tarefa..."
+
                             value={inputValue}
                             onChange={(e) => setInputValue(e.target.value)}
+
                             onKeyDown={(e) => e.key === "Enter" && addTask()}
                         />
+
                         <button
                             className="p-2 bg-principal text-white rounded-r-md hover:bg-opacity-80 transition-colors"
                             onClick={addTask}
                         >
+
                             Adicionar
+
                         </button>
+
                     </div>
-                    <ul className="list-none p-0">
-                        {/* Mapeia o array de tarefas para renderizar cada item na tela. */}
+
+                    <ul className="list-none p-0 w-full flex flex-wrap gap-2">
+
                         {tasks.map((task) => (
+
                             <li
                                 key={task.id}
-                                className="flex items-center justify-between bg-white p-3 mb-2 rounded-md shadow-sm"
+                                className={`w-[calc(50%-0.5rem)] justify-between bg-white p-2 rounded-md shadow-sm ${task.important ? 'bg-yellow-200 border-l-4 border-yellow-500' : ''}`}
+
                             >
-                                <span>{task.text}</span>
+
+                                <span
+
+                                    style={{ textDecoration: task.completed ? "line-through" : "none" }}
+
+                                    onClick={() => toggleComplete(task.id)}
+
+                                    className="cursor-pointer min-w-0 break-all">
+
+                                    <strong>{task.subject}</strong>
+                                    <br />
+                                    {task.text}
+
+                                    <button
+                                        className={`text-2xl m-5 transition-transform duration-200 ${task.important ? 'text-yellow-500 transform scale-125' : 'text-gray-400'
+                                            }`}
+                                        onClick={() => toggleImportant(task.id)}
+                                    >
+                                        ★
+                                    </button>
+                                    
+                                </span>
+
                                 <button
                                     className="text-red-500 hover:text-red-700"
                                     onClick={() => removeTask(task.id)}
                                 >
+
                                     Remover
+
                                 </button>
+
                             </li>
                         ))}
                     </ul>
                 </div>
+
             </div>
             <div className="w-1/1 bg-destaque-claro mb-15 mt-7 mr-5 rounded-2xl shadow-md hover:shadow-lg transition-all duration-150 ease">
 
             </div>
         </div>
-        
+
     )
 }
